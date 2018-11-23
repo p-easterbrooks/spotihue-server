@@ -1,102 +1,60 @@
-var getJSON = function(url, callback) {
-  var xhr = new XMLHttpRequest();
-  xhr.open('GET', url, true);
-  xhr.responseType = 'json';
-  xhr.onload = function() {
-    var status = xhr.status;
-    if (status === 200) {
-      callback(null, xhr.response);
-    } 
-    else {
-      callback(status, xhr.response);
-    }
-  };
-  xhr.send();
-};
+var imgUrl
 
-getJSON('http://127.0.0.1:5000/',
-function(err, data) {
-  if (err !== null) {
-    alert('Something went wrong: ' + err);
-  } 
-  else {
-    console.log(data.album.images[0].url);
-    document.getElementById('myImg').src=data.album.images[1].url;
+(function poll () {
+    $.ajax({
+        url: 'https://api.spotify.com/v1/me/player/currently-playing',
+        beforeSend: function(request) {
+            request.setRequestHeader('Authorization', 'Bearer BQA4eeLL2LLQNwACm2-hhEq4v3Ey9Pq9ZuSjUY_lGjuIoIsyXYj3ZhLCVGHBxbJoyMX6jnYPWKezhRfM_7rNbRPJJ_T81i2yQ2UIUv18n9uITY6m8NUoMaVgeBQ-S7Ljd_IicWSAM3O9hlKx-_nv2pmI89s')
+        },
+        type: 'GET',
+        success: function (data) {
+            console.log('polling')
+            if (data.item.album.images[1].url !== imgUrl) {
+                console.log('NEW IMAGE');
+                imgUrl = data.item.album.images[1].url
+                getColorFromUrl(imgUrl, function (color) {
+                        var r = color[0]
+                        var g = color[1]
+                        var b = color[2]
 
-    var img = new Image();
-    img.onload = function () {
-      var colorThief = new ColorThief();
-      var numberOfColors = 4;
-      console.log(colorThief.getPalette(img, numberOfColors));
+                        var colorX = rgb_to_cie(r, g, b)[0]
+                        var colorY = rgb_to_cie(r, g, b)[1]
 
-      //---
-      var r = colorThief.getPalette(img, numberOfColors)[0][0];
-      var g = colorThief.getPalette(img, numberOfColors)[0][1];
-      var b = colorThief.getPalette(img, numberOfColors)[0][2];
-      document.getElementById('color-one').style.backgroundColor = 'rgb(' + r + ',' + g + ',' + b + ')';
+                        //set color on ambiance light
+                        setLamp(colorX, colorY, 3)
+                        $('body').css('backgroundColor', 'rgb('+ r + ',' + g +',' + b + ')')
+                        //document.body.style.backgroundColor = rgb(r, g, b)
+                })
+            }
+        },
+        dataType: 'json',
+        complete: setTimeout(function () { poll() }, 5000),
+        timeout: 2000
+    })
+})()
 
-      console.log("color-one xy: " + rgb_to_cie(r, g, b));
-      var colorOneX = rgb_to_cie(r, g, b)[0];
-      var colorOneY = rgb_to_cie(r, g, b)[1];
-
-      //---
-
-      var r = colorThief.getPalette(img, numberOfColors)[1][0];
-      var g = colorThief.getPalette(img, numberOfColors)[1][1];
-      var b = colorThief.getPalette(img, numberOfColors)[1][2];
-      document.getElementById('color-two').style.backgroundColor = 'rgb(' + r + ',' + g + ',' + b + ')';
-
-      console.log("color-two xy: " + rgb_to_cie(r, g, b));
-      var colorTwoX = rgb_to_cie(r, g, b)[0];
-      var colorTwoY = rgb_to_cie(r, g, b)[1];
-
-      //---
-
-      var r = colorThief.getPalette(img, numberOfColors)[2][0];
-      var g = colorThief.getPalette(img, numberOfColors)[2][1];
-      var b = colorThief.getPalette(img, numberOfColors)[2][2];
-      document.getElementById('color-three').style.backgroundColor = 'rgb(' + r + ',' + g + ',' + b + ')';
-
-      console.log("color-three xy: " + rgb_to_cie(r, g, b));
-      var colorThreeX = rgb_to_cie(r, g, b)[0];
-      var colorThreeY = rgb_to_cie(r, g, b)[1];
-
-      //---
-
-      var r = colorThief.getPalette(img, numberOfColors)[3][0];
-      var g = colorThief.getPalette(img, numberOfColors)[3][1];
-      var b = colorThief.getPalette(img, numberOfColors)[3][2];
-      document.getElementById('color-four').style.backgroundColor = 'rgb(' + r + ',' + g + ',' + b + ')';
-
-      console.log("color-four xy: " + rgb_to_cie(r, g, b));
-      var colorFourX = rgb_to_cie(r, g, b)[0];
-      var colorFourY = rgb_to_cie(r, g, b)[1];
-
-      //---
-      
-      setLamp(colorOneX, colorOneY, 1);
-      setLamp(colorOneX, colorOneY, 3);
-      setLamp(colorTwoX, colorTwoY, 4);
-      setLamp(colorTwoX, colorTwoY, 5);
+function getColorFromUrl (imageUrl, callback) {
+    sourceImage = document.createElement('img')
+    sourceImage.crossOrigin = 'Anonymous'
+    var thief = new ColorThief()
+    sourceImage.src = imageUrl
+    sourceImage.onload = function () {
+      callback(thief.getPalette(sourceImage, 5, 5)[0])
     };
-    img.crossOrigin = 'Anonymous';
-    img.src = document.getElementById('myImg').src;
-  }
-});
+}
 
-function setLamp(x,y, lightNumber) {
-  var myX = Number(x);
-  var myY = Number(y);
-  var hubIP = "";
-  var username = "";
-  var URL = "http://" + hubIP + "/api/" + username + "/lights/" + lightNumber + "/state";
-  var dataObject = {"on":true, "sat":254, "bri":254,"xy":[myX,myY]}
-  console.log(JSON.stringify(dataObject));
+function setLamp (x, y, lightNumber) {
+  var myX = Number(x)
+  var myY = Number(y)
+  var hubIP = '192.168.1.219'
+  var username = '974DELC9EApDxKHu3W5P2fjMCE7YWbrM2LmVRoJv'
+  var URL = 'http://' + hubIP + '/api/' + username + '/lights/' + lightNumber + '/state'
+  var dataObject = {'on': true, 'sat': 254, 'bri': 254, 'xy': [ myX, myY]}
 
   $.ajax({
       url: URL,
-      type: 'PUT',    
+      type: 'PUT',
       data: JSON.stringify(dataObject),
-      contentType: 'application/json',
-  });
+      contentType: 'application/json'
+  })
 }
