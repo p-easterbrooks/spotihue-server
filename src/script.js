@@ -22,6 +22,8 @@ var imgUrl
 
                         //set color on ambiance light
                         setLamp(colorX, colorY, 3)
+                        $('body').css('backgroundColor', 'rgb('+ r + ',' + g +',' + b + ')')
+                        //document.body.style.backgroundColor = rgb(r, g, b)
                 })
             }
         },
