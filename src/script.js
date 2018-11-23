@@ -1,12 +1,13 @@
 var getJSON = function(url, callback) {
   var xhr = new XMLHttpRequest();
   xhr.open('GET', url, true);
+  xhr.setRequestHeader('Authorization', 'Bearer BQAjK8X_EKZl7fyUk7EQRF7382bv1Oeyh_zi7i9ab2M-0EbhduwXEz65ZLJXZZcW_Dr7PCWn6eMwPw4yY2y_F15jZt5YCSyJMqtHg4UWl2hm2UfvL6Wn6ErwCIwLuQe5R9OUdZJZ1KVzMxHCKmTw8_kJWk4')
   xhr.responseType = 'json';
   xhr.onload = function() {
     var status = xhr.status;
     if (status === 200) {
       callback(null, xhr.response);
-    } 
+    }
     else {
       callback(status, xhr.response);
     }
@@ -14,7 +15,7 @@ var getJSON = function(url, callback) {
   xhr.send();
 };
 
-getJSON('http://127.0.0.1:5000/', getDominantColor);
+getJSON('https://api.spotify.com/v1/me/player/currently-playing', getDominantColor);
 
 function getDominantColor(err, data) {
   if (err !== null) {
