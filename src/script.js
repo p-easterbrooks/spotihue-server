@@ -1,40 +1,35 @@
-var getJSON = function (url, callback) {
-  var xhr = new XMLHttpRequest()
-  xhr.open('GET', url, true)
-  xhr.setRequestHeader('Authorization', 'Bearer BQDdnOYv2yvhGnrfRWaG6bULiLQGTSI2IwIY7lpDlKf9Db_hPsUj77pDX49Z3fhZ8y3-SRjF5MQ_5iQS9SCp9bPDI09q4z1jDmaV2P1JVrEwkarMUrDYtqv3A6RGBAWy0TQsL4GJSaXyriPd3GXGVPqo-bc')
-  xhr.responseType = 'json'
-  xhr.onload = function () {
-    var status = xhr.status
-    if (status === 200) {
-      callback(null, xhr.response)
-    } else {
-      callback(status, xhr.response)
-    }
-  }
-  xhr.send()
-}
+var imgUrl
 
-getJSON('https://api.spotify.com/v1/me/player/currently-playing', getDominantColor)
+(function poll () {
+    $.ajax({
+        url: 'https://api.spotify.com/v1/me/player/currently-playing',
+        beforeSend: function(request) {
+            request.setRequestHeader('Authorization', 'Bearer BQA4eeLL2LLQNwACm2-hhEq4v3Ey9Pq9ZuSjUY_lGjuIoIsyXYj3ZhLCVGHBxbJoyMX6jnYPWKezhRfM_7rNbRPJJ_T81i2yQ2UIUv18n9uITY6m8NUoMaVgeBQ-S7Ljd_IicWSAM3O9hlKx-_nv2pmI89s')
+        },
+        type: 'GET',
+        success: function (data) {
+            console.log('polling')
+            if (data.item.album.images[1].url !== imgUrl) {
+                console.log('NEW IMAGE');
+                imgUrl = data.item.album.images[1].url
+                getColorFromUrl(imgUrl, function (color) {
+                        var r = color[0]
+                        var g = color[1]
+                        var b = color[2]
 
-function getDominantColor (err, data) {
-  if (err !== null) {
-    alert('Something went wrong: ' + err)
-  } else {
-    var imgUrl = data.item.album.images[1].url
+                        var colorX = rgb_to_cie(r, g, b)[0]
+                        var colorY = rgb_to_cie(r, g, b)[1]
 
-    getColorFromUrl(imgUrl, function (color) {
-            var r = color[0]
-            var g = color[1]
-            var b = color[2]
-
-            var colorX = rgb_to_cie(r, g, b)[0]
-            var colorY = rgb_to_cie(r, g, b)[1]
-
-            //set color on ambiance light
-            setLamp(colorX, colorY, 3)
+                        //set color on ambiance light
+                        setLamp(colorX, colorY, 3)
+                })
+            }
+        },
+        dataType: 'json',
+        complete: setTimeout(function () { poll() }, 5000),
+        timeout: 2000
     })
-  }
-}
+})()
 
 function getColorFromUrl (imageUrl, callback) {
     sourceImage = document.createElement('img')
