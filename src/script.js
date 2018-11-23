@@ -14,8 +14,9 @@ var getJSON = function(url, callback) {
   xhr.send();
 };
 
-getJSON('http://127.0.0.1:5000/',
-function(err, data) {
+getJSON('http://127.0.0.1:5000/', getDominantColor);
+
+function getDominantColor(err, data) {
   if (err !== null) {
     alert('Something went wrong: ' + err);
   } 
@@ -34,8 +35,8 @@ function(err, data) {
             //set color on ambiance light
             setLamp(colorX, colorY, 3);
     });
-  }
-});
+  }  
+}
 
 function getColorFromUrl(imageUrl, callback) {
     sourceImage = document.createElement("img");
