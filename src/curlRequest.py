@@ -7,14 +7,15 @@ CORS(app)
 
 
 headers = {
-	'Authorization': 'Bearer BQDe6mbNgXH6PxRBdDQaeWQwiizoz6fzpPgMyRMBOmQ5pmL8XFKwXGBvWrb7fsvE8gfFukppiio-450QSolrvq388y1moUvX-RYrgTN6yyN8Aw6EPtJ5HLFm6KE8WQXUjmUYsHcRw4UeuzFevg',
+	'Authorization': 'Bearer BQDw10_3p9DjgSThBTFDnGOg1hUROPixSl-9r3GIrtrEyBx_i-dG2yfGYkB-HGYDm2ff1TTxnykJaAAARS8ya6oeLXDATYJIbyIlubCYyFhZH_iutIGaGuM4DF08ws6LlUJxVs7keYE13kVO_9V6EsNRRhY',
 }
 
-f = open("songIdLog.txt", "r")
-spotify,track,mySong=str.split(f.read().strip()	, ':')
-f.close()
+#f = open("songIdLog.txt", "r")
+#spotify,track,mySong=str.split(f.read().strip()	, ':')
+#f.close()
 
-response = requests.get("https://api.spotify.com/v1/tracks/" + str(mySong), headers=headers)
+# use player to retrieve song
+response = requests.get("https://api.spotify.com/v1/me/player/currently-playing", headers=headers)
 
 # print(response.text)
 
