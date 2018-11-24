@@ -24,7 +24,7 @@ var imgUrl
                         var lampCIEColor = getCIEColor(primaryColor)
 
                         //set color on ambiance light
-                        //setLamp(lampCIEColor[0], lampCIEColor[1], 3)
+                        setLamp(lampCIEColor[0], lampCIEColor[1], 3)
 
                         //set colors on UI
                         $('#title').css('color', 'rgb(' + primaryColor[0] + ',' + primaryColor[1] +',' + primaryColor[2] + ')')
