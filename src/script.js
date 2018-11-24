@@ -4,7 +4,7 @@ var imgUrl
     $.ajax({
         url: 'https://api.spotify.com/v1/me/player/currently-playing',
         beforeSend: function (request) {
-            request.setRequestHeader('Authorization', 'Bearer BQB56lWmQoFE6Q5xmsy4JVSJfHFVo1X2wjVf1laDHxycQgFiuN3K8a18jwXUU2l-m48pZX5V7zpDUzRx1rf6GRuMb1oSK_Ve8eier4kgzcSHZFwCK_KGlF63ldXcZHxxcXLo0LhdAUa2v-u_hOSORdH4wKA')
+            request.setRequestHeader('Authorization', 'Bearer BQBC1ysqKKV25fv3GkOaBzWefV0x1fA4Ti4QU3DHjLSZHjGfdz3L70koADqvSaAaL4J119r0d0f39y_jHUhGOVojxzLYAPDdhWuBlsa5lHVVAjbR2RS1Fqtn06RX5dhy8CU93R57P95WEyNal-pDyQDMU0Y')
         },
         type: 'GET',
         success: function (data) {
@@ -12,7 +12,11 @@ var imgUrl
             if (data.item.album.images[1].url !== imgUrl) {
                 console.log('NEW IMAGE')
                 imgUrl = data.item.album.images[1].url
-                $('.bg-image-blur, .bg-image').css('background-image', 'url(\'' + imgUrl + '\')')
+
+                $('.bg-image-blur, .bg-image').fadeTo(375, 0, function () {
+                  $(this).css('background-image', 'url(\'' + imgUrl + '\')')
+              }).fadeTo(375, 1)
+
                 getPaletteFromUrl(imgUrl, function (palette) {
                         var primaryColor = palette[0]
                         var secondaryColor = palette[1]
@@ -20,7 +24,7 @@ var imgUrl
                         var lampCIEColor = getCIEColor(primaryColor)
 
                         //set color on ambiance light
-                        setLamp(lampCIEColor[0], lampCIEColor[1], 3)
+                        //setLamp(lampCIEColor[0], lampCIEColor[1], 3)
 
                         //set colors on UI
                         $('#title').css('color', 'rgb(' + primaryColor[0] + ',' + primaryColor[1] +',' + primaryColor[2] + ')')
