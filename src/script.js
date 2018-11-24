@@ -3,43 +3,52 @@ var imgUrl
 (function poll () {
     $.ajax({
         url: 'https://api.spotify.com/v1/me/player/currently-playing',
-        beforeSend: function(request) {
-            request.setRequestHeader('Authorization', 'Bearer BQA4eeLL2LLQNwACm2-hhEq4v3Ey9Pq9ZuSjUY_lGjuIoIsyXYj3ZhLCVGHBxbJoyMX6jnYPWKezhRfM_7rNbRPJJ_T81i2yQ2UIUv18n9uITY6m8NUoMaVgeBQ-S7Ljd_IicWSAM3O9hlKx-_nv2pmI89s')
+        beforeSend: function (request) {
+            request.setRequestHeader('Authorization', 'Bearer BQB56lWmQoFE6Q5xmsy4JVSJfHFVo1X2wjVf1laDHxycQgFiuN3K8a18jwXUU2l-m48pZX5V7zpDUzRx1rf6GRuMb1oSK_Ve8eier4kgzcSHZFwCK_KGlF63ldXcZHxxcXLo0LhdAUa2v-u_hOSORdH4wKA')
         },
         type: 'GET',
         success: function (data) {
             console.log('polling')
             if (data.item.album.images[1].url !== imgUrl) {
-                console.log('NEW IMAGE');
+                console.log('NEW IMAGE')
                 imgUrl = data.item.album.images[1].url
-                getColorFromUrl(imgUrl, function (color) {
-                        var r = color[0]
-                        var g = color[1]
-                        var b = color[2]
+                $('.bg-image-blur, .bg-image').css('background-image', 'url(\'' + imgUrl + '\')')
+                getPaletteFromUrl(imgUrl, function (palette) {
+                        var primaryColor = palette[0]
+                        var secondaryColor = palette[1]
 
-                        var colorX = rgb_to_cie(r, g, b)[0]
-                        var colorY = rgb_to_cie(r, g, b)[1]
+                        var lampCIEColor = getCIEColor(primaryColor)
 
                         //set color on ambiance light
-                        setLamp(colorX, colorY, 3)
-                        $('body').css('backgroundColor', 'rgb('+ r + ',' + g +',' + b + ')')
-                        //document.body.style.backgroundColor = rgb(r, g, b)
+                        setLamp(lampCIEColor[0], lampCIEColor[1], 3)
+
+                        //set colors on UI
+                        $('#title').css('color', 'rgb(' + primaryColor[0] + ',' + primaryColor[1] +',' + primaryColor[2] + ')')
+                        $('body').css('backgroundColor', 'rgb(' + secondaryColor[0] + ',' + secondaryColor[1] +',' + secondaryColor[2] + ')')
                 })
             }
         },
         dataType: 'json',
-        complete: setTimeout(function () { poll() }, 5000),
-        timeout: 2000
+        complete: setTimeout(function () { poll() }, 2000),
+        timeout: 1000
     })
 })()
 
-function getColorFromUrl (imageUrl, callback) {
+function getCIEColor (color) {
+    var r = color[0]
+    var g = color[1]
+    var b = color[2]
+
+    return rgb_to_cie(r, g, b)
+}
+
+function getPaletteFromUrl (imageUrl, callback) {
     sourceImage = document.createElement('img')
     sourceImage.crossOrigin = 'Anonymous'
     var thief = new ColorThief()
     sourceImage.src = imageUrl
     sourceImage.onload = function () {
-      callback(thief.getPalette(sourceImage, 5, 5)[0])
+      callback(thief.getPalette(sourceImage, 5, 5))
     };
 }
 
