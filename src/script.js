@@ -1,4 +1,5 @@
 var imgUrl
+var spotihueServer = 'http://localhost:3000'
 
 (function poll () {
     $.ajax({
