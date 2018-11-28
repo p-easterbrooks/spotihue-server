@@ -59,14 +59,6 @@ function doAction(error, response, body) {
     }
 }
 
-function getCIEColor(color) {
-    var r = color[0]
-    var g = color[1]
-    var b = color[2]
-
-    return rgb_to_cie(r, g, b)
-}
-
 function getPaletteFromURL(imageUrl, callback) {
         //create canvas and image
         var img = new Image()
