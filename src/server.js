@@ -1,4 +1,3 @@
-// content of index.js
 //imports
 const http = require('http')
 const port = 3000
@@ -6,17 +5,17 @@ const request = require('request')
 const Poller = require('./Poller')
 const ColorThief = require('./color-thief')
 const ColorConverter = require('./color-converter')
-var Canvas = require('canvas')
-var Image = Canvas.Image
 
 //global var
 var imgUrl
 
+//TODO handle client requests
 const requestHandler = (request, response) => {
     console.log(request.url)
-    response.end('Hello Node.js Server!')
+    response.end()
 }
 
+//server
 const server = http.createServer(requestHandler)
 
 server.listen(port, (err) => {
@@ -61,7 +60,7 @@ function doAction(error, response, body) {
 
 function getPaletteFromURL(imageUrl, callback) {
         //create canvas and image
-        var img = new Image()
+        var img = require('canvas').Image
         img.src = imageUrl
         img.crossOrigin = 'Anonymous'
 
@@ -76,7 +75,7 @@ function processColors(palette) {
     var lampCIEColor = ColorConverter.rgb_to_cie(primaryColor[0], primaryColor[1], primaryColor[2])
 
     //set color on ambiance light
-    //setLamp(lampCIEColor[0], lampCIEColor[1], 3)
+    setLamp(lampCIEColor[0], lampCIEColor[1], 3)
 }
 
 function setLamp(x, y, lightNumber) {
