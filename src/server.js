@@ -7,7 +7,6 @@ const Poller = require('./Poller')
 const ColorThief = require('./color-thief')
 const ColorConverter = require('./color-converter')
 var Canvas = require('canvas')
-var fs = require('fs')
 var Image = Canvas.Image
 
 //global var
@@ -74,14 +73,7 @@ function getPaletteFromURL(imageUrl, callback) {
         img.src = imageUrl
         img.crossOrigin = 'Anonymous'
 
-        img.onload = function () {
-            /*var canvas = new Canvas.Canvas(300, 300)
-            var ctx = canvas.getContext('2d')
-            ctx.drawImage(img, 0, 0, 300, 300)
-            var thief = new ColorThief()
-            canvas.createJPEGStream().pipe(fs.createWriteStream('coverArt.jpeg'))*/
-            callback(new ColorThief().getPalette(img, 5, 5))
-        }
+        img.onload = () => callback(new ColorThief().getPalette(img, 5, 5))
 }
 
 function processColors(palette) {
