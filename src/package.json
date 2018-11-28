@@ -20,5 +20,8 @@
   "bugs": {
     "url": "https://github.com/p-easterbrooks/Spotihue/issues"
   },
-  "homepage": "https://github.com/p-easterbrooks/Spotihue#readme"
+  "homepage": "https://github.com/p-easterbrooks/Spotihue#readme",
+  "dependencies": {
+    "@mariotacke/color-thief": "^3.0.1"
+  }
 }
