@@ -5,6 +5,8 @@ const request = require('request')
 const Poller = require('./Poller')
 const ColorThief = require('./color-thief')
 const ColorConverter = require('./color-converter')
+const chalk = require('chalk');
+var Image = require('canvas').Image
 
 //global var
 var imgUrl
@@ -36,10 +38,10 @@ server.listen(port, (err) => {
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json',
-                'Authorization': 'Bearer BQB2neq-3i2JnPsJ8razKyPgfG47h-m9GEkt1v4WQA0WDmoCYtRKbYr-xD9k1FxNDusIEQxn0QnQIaq-sQs5ExldOmc8Fp93cVRYqdwhelY71O0BFoPw0MevdW8Rk66VNJrgCCJszkEyCYGod5QrV4LRNIU'
+                'Authorization': 'Bearer BQAOrniWskRJp2tRsE3JUjhpn1nP5loQKko3BLzhIkxYehq_NZaED_nG1TINryjsGwwl0RdGmRZ06UrzUewI7gK3eVaR_W7IRUAWeHDT7OAwWre5QnYTvtF3iA9llbsgUpFYLKFrxpaQF9yVdo4M_XAfgQE'
             }
         };
-        request(options, doAction)
+        request(options, doAction) 
 
         poller.poll(); // Go for the next poll
     });
@@ -60,7 +62,7 @@ function doAction(error, response, body) {
 
 function getPaletteFromURL(imageUrl, callback) {
         //create canvas and image
-        var img = require('canvas').Image
+        var img = new Image()
         img.src = imageUrl
         img.crossOrigin = 'Anonymous'
 
@@ -70,8 +72,12 @@ function getPaletteFromURL(imageUrl, callback) {
 function processColors(palette) {
     var primaryColor = palette[0]
     var secondaryColor = palette[1]
+    var tertiaryColor = palette[2]
 
-    console.log(palette[0])
+    console.log(chalk.bold.rgb(primaryColor[0], primaryColor[1], primaryColor[2])('PRIMARY COLOR'))
+    console.log(chalk.bold.rgb(secondaryColor[0], secondaryColor[1], secondaryColor[2])('SECONDARY COLOR'))
+    console.log(chalk.bold.rgb(tertiaryColor[0], tertiaryColor[1], tertiaryColor[2])('TERTIARY COLOR'))
+
     var lampCIEColor = ColorConverter.rgb_to_cie(primaryColor[0], primaryColor[1], primaryColor[2])
 
     //set color on ambiance light
@@ -84,13 +90,11 @@ function setLamp(x, y, lightNumber) {
     var hubIP = '192.168.1.219'
     var username = '974DELC9EApDxKHu3W5P2fjMCE7YWbrM2LmVRoJv'
     var URL = `http://${hubIP}/api/${username}/lights/${lightNumber}/state`
-    var dataObject = { 'on': true, 'sat': 254, 'bri': 254, 'xy': [myX, myY] }
 
     const options = {
-        url: URL,
         json: true,
-        body: JSON.stringify(dataObject)
+        body:  { 'on': true, 'sat': 254, 'bri': 254, 'xy': [myX, myY] }
     }
 
-    request.put(options);
+    request.put(URL, options);
 }
